@@ -23,7 +23,7 @@ Real Weather is a simple, responsive weather application built with HTML, CSS, a
 
 ## Customization
 
-Feel free to modify the HTML, CSS, or JavaScript in `Untitled-1` to suit your needs.
+Feel free to modify the HTML, CSS, or JavaScript in `index.html` to suit your needs.
 
 ## License
 
