@@ -18,7 +18,7 @@ Real Weather is a simple, responsive weather application built with HTML, CSS, a
 
 ## Usage
 
-1. Open the `Untitled-1` file in your browser or host it on a web server.
+1. Open the `index.html` file in your browser or host it on a web server.
 2. Enter a city name and press the "Get Weather" button (or press Enter) to view the weather details.
 
 ## Customization
