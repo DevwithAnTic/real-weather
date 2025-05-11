@@ -282,11 +282,11 @@
               : ""
           }
           <p><strong>${city}</strong></p>
-          <p>Feels like: <strong>${parseInt(cur.FeelsLikeC) + 7}°C (${
+          <p>Feels like: <strong>${cur.FeelsLikeC}°C (${
             cur.weatherDesc[0].value
           })</strong></p>  temperature
           <p style="font-size:.85rem;opacity:.8;">(Actual: ${cur.temp_C}°C)</p>
-        `; //error correction by adding 7 to the feels like
+        `;
         } catch (e) {
           document.getElementById("output").textContent = "Error: " + e.message;
         }
