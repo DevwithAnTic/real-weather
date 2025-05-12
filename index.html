@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real Weather 🌤️</title>
+    <meta name="author" content="AnTic" />
+    <meta name="description" content="See the Real Temperature" />
+    <meta name="keywords" content="HTML, CSS, JavaScript" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="dark">
+    <div class="weather-app">
+      <h1>Real Weather.</h1>
+      <input id="cityInput" type="text" placeholder="Enter city (e.g., Kolkata)" />
+      <button id="getWeatherBtn">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/search--v1.png" alt="search icon" style="width: 20px; height: 20px; margin-right: 8px" />
+        Get Weather
+      </button>
+      <!-- Loading bar (initially hidden) -->
+      <div id="loading" class="loading"></div>
+      <div id="output" class="output"></div>
+      <button id="toggleDark" class="toggle-dark">
+        <img id="modeIcon" src="https://img.icons8.com/ios-glyphs/30/ffffff/moon-symbol.png" alt="mode icon" />
+        <span>Dark Mode</span>
+      </button>
+    </div>
+    <p class="copyright" style="position: fixed; bottom: 3px; color: var(--text-dark);">
+      Made with <span style="color: red">&hearts;</span>
+    </p>
+    <p class="copyright" style="position: fixed; bottom: -12px; color: var(--text-dark);">
+      By AnTic
+    </p>
+    <script src="script.js"></script>
+  </body>
+</html>
