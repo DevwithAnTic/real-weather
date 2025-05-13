@@ -43,8 +43,21 @@ async function handleWeatherFetch() {
   loadingEl.style.display = "block";
 
   if (!city) {
-    // If no city is entered, use geolocation
-    if (navigator.geolocation) {
+    // If no city is entered, try using Android's geolocation interface if available.
+    if (typeof AndroidGeo !== "undefined" && AndroidGeo.getLocation) {
+      try {
+        // AndroidGeo.getLocation() should return a JSON string with keys "latitude" and "longitude"
+        const locationJSON = AndroidGeo.getLocation();
+        const location = JSON.parse(locationJSON);
+        const lat = location.latitude;
+        const lon = location.longitude;
+        fetchWeatherFromGeo(lat, lon);
+      } catch (error) {
+        loadingEl.style.display = "none";
+        alert("Android location error: " + error.message);
+      }
+    } else if (navigator.geolocation) {
+      // Fallback to browser geolocation.
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
@@ -67,12 +80,31 @@ async function handleWeatherFetch() {
   }
 }
 
+// Helper functions
+function formatTime(date) {
+  const hours = date.getHours();
+  const minutes = ("0" + date.getMinutes()).slice(-2);
+  return `${hours}:${minutes}`;
+}
+
+function degToCompass(num) {
+  const val = Math.floor(num / 22.5 + 0.5);
+  const arr = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+  return arr[val % 16];
+}
+
+// Updated helper to get arrow symbol based on wind degree, adjusted by 180°.
+function getWindArrow(deg) {
+  const rotated = (deg + 180) % 360;
+  const sectors = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"];
+  const index = Math.floor((rotated + 22.5) / 45) % 8;
+  return sectors[index];
+}
+
 async function fetchWeatherFromOWM(city) {
   try {
     const res = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(
-        city
-      )}&appid=${API_KEY}&units=metric`
+      `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`
     );
     if (!res.ok) throw new Error("City not found");
     const data = await res.json();
@@ -82,9 +114,16 @@ async function fetchWeatherFromOWM(city) {
     const desc = current.weather[0].description;
     const humidity = current.main.humidity;
     const windSpeed = current.wind.speed;
-    const chanceOfRain = current.pop ? Math.round(current.pop * 100) : 0;
+    // Get wind direction from degrees.
+    const windArrow = getWindArrow(current.wind.deg);
     const icon = current.weather[0].icon;
     const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+
+    // Format sunrise and sunset from city's Unix timestamps.
+    const sunrise = new Date(data.city.sunrise * 1000);
+    const sunset = new Date(data.city.sunset * 1000);
+    const formattedSunrise = formatTime(sunrise);
+    const formattedSunset = formatTime(sunset);
 
     setTimeout(() => {
       loadingEl.style.display = "none";
@@ -95,10 +134,10 @@ async function fetchWeatherFromOWM(city) {
           <p class="weather-desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</p>
           <div class="info-grid">
             <div class="info wide">Feels like<br><strong>${feelsLike}°C</strong></div>
-            <div class="info">Rain chance<br><strong>${chanceOfRain}%</strong></div>
             <div class="info">Humidity<br><strong>${humidity}%</strong></div>
-            <div class="info">Wind<br><strong>${windSpeed} m/s</strong></div>
+            <div class="info">Wind<br><strong>${windArrow} ${windSpeed} m/s</strong></div>
             <div class="info">Temp<br><strong>${temp}°C</strong></div>
+            <div class="info">Sunrise/Sunset<br><strong>${formattedSunrise} / ${formattedSunset}</strong></div>
           </div>
         </div>
       `;
@@ -123,14 +162,19 @@ async function fetchWeatherFromGeo(lat, lon) {
     const temp = Math.round(current.main.temp);
     const desc = current.weather[0].description;
     const humidity = current.main.humidity;
+    const windArrow = getWindArrow(current.wind.deg);
     const windSpeed = current.wind.speed;
-    const chanceOfRain = current.pop ? Math.round(current.pop * 100) : 0;
     const icon = current.weather[0].icon;
     const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
-    
-    // Use the location name provided by the API
+
+    // Format sunrise and sunset times.
+    const sunrise = new Date(data.city.sunrise * 1000);
+    const sunset = new Date(data.city.sunset * 1000);
+    const formattedSunrise = formatTime(sunrise);
+    const formattedSunset = formatTime(sunset);
+
+    // Use the location name provided by the API.
     const locationName = data.city.name;
-    // Save the location name to localStorage and update the input.
     localStorage.setItem("weatherCity", locationName);
     input.value = locationName;
 
@@ -143,10 +187,10 @@ async function fetchWeatherFromGeo(lat, lon) {
           <p class="weather-desc">${desc.charAt(0).toUpperCase() + desc.slice(1)}</p>
           <div class="info-grid">
             <div class="info wide">Feels like<br><strong>${feelsLike}°C</strong></div>
-            <div class="info">Rain chance<br><strong>${chanceOfRain}%</strong></div>
             <div class="info">Humidity<br><strong>${humidity}%</strong></div>
-            <div class="info">Wind<br><strong>${windSpeed} m/s</strong></div>
+            <div class="info">Wind<br><strong>${windArrow} ${windSpeed} m/s</strong></div>
             <div class="info">Temp<br><strong>${temp}°C</strong></div>
+            <div class="info">Sunrise/Sunset<br><strong>${formattedSunrise} / ${formattedSunset}</strong></div>
           </div>
         </div>
       `;

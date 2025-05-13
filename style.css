@@ -82,6 +82,16 @@ body.dark::before {
   backdrop-filter: blur(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: background var(--transition-speed), color var(--transition-speed);
+  /* Make container vertically scrollable */
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch; /* Enables native rubber band scrolling on iOS */
+  overscroll-behavior: contain; /* Prevents scroll chaining to parent elements */
+}
+
+.weather-app::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, Opera */
 }
 
 body.dark .weather-app {
